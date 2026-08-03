@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sam Ashwin & Vishhni Rau | Wedding Invitation</title>
+
+    <meta name="description"
+        content="We cordially invite you to our wedding.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sam Ashwin & Vishhni Rau | Wedding Invitation">
+    <meta property="og:description" content="Wedding invitation website">
+    <meta property="og:image"
+        content="https://sam-vishhni.vercel.app/assests/images/prvv.png">
+    <meta property="og:url"
+        content="https://sam-vishhni.vercel.app/">
+    <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&family=Marcellus&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+</head>
+
+<body>
+
+    <audio id="bgMusic" preload="auto" loop>
+    <source src="assests/audio/music1.mp3" type="audio/mpeg">
+</audio>
+
+    <!-- MUSIC BUTTON -->
+    <button id="musicToggle" class="music-toggle">
+        <span id="musicIcon">🔊</span>
+    </button>
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero-section">
+
+        <div class="video-container">
+
+            <video
+                id="curtainVideo"
+                playsinline
+                webkit-playsinline
+                preload="auto"
+                muted
+                poster="assests/images/first.jpg">
+
+                <source
+                    src="assests/videos/nadavd.mp4"
+                    type="video/mp4">
+
+            </video>
+
+            <!-- Overlay -->
+
+            <div id="playOverlay" class="overlay">
+
+                <img
+                    src="assests/images/cover.png"
+                    class="overlay-image"
+                    alt="Cover Image">
+
+                <div class="overlay-content">
+
+                    <iconify-icon
+                        icon="majesticons:hand-click-line"
+                        class="hand-icon">
+                    </iconify-icon>
+
+                    <p class="tap-text">
+                        Open Invitation
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= INVITATION ================= -->
+
+    <section class="image-stack">
+
+        <!-- Image 1 -->
+        <div class="img-wrap invitation-card">
+            <img src="assests/images/1.png" alt="">
+
+            <div class="getting-married-text">WE'RE GETTING MARRIED</div>
+
+            <div class="first-image-text second-text">
+                <div class="name-line">Sam Ashwin Jabaraj</div>
+
+                <div class="union-symbol">
+                    <span class="union-line"></span>
+                    <span class="weds-word">&</span>
+                    <span class="union-line"></span>
+                </div>
+
+                <div class="name-line">Vishhni Rau</div>
+            </div>
+
+            <div class="invitation-date">11-NOVEMBER-2026</div>
+
+            <div class="scroll-prompt">
+                <span class="scroll-text">Scroll</span>
+                <span class="scroll-chevron" aria-hidden="true">⌄</span>
+            </div>
+        </div>
+
+        <!-- Image 2 -->
+        <div class="img-wrap">
+            <img src="assests/images/2.png" alt="">
+        </div>
+
+        <!-- Image 3 -->
+        <div class="img-wrap event-collage-wrap image-three-wrap">
+            <section class="scratch-section">
+                <div class="content-wrapper scroll-animate">
+                    <p class="reveal-text">Reveal</p><BR>
+                    <p class="discover-text">
+                        <span>SCRATCH TO
+                        DISCOVER THE DATE</span>
+                    </p>
+
+                    <div class="scratch-container">
+                        <div class="scratch-card">
+                            <div class="scratch-base">
+                                <span class="scratch-date">11</span>
+                            </div>
+                            <canvas class="scratch-canvas" width="90" height="90"></canvas>
+                        </div>
+
+                        <div class="scratch-card">
+                            <div class="scratch-base">
+                                <span class="scratch-date">NOV</span>
+                            </div>
+                            <canvas class="scratch-canvas" width="90" height="90"></canvas>
+                        </div>
+
+                        <div class="scratch-card">
+                            <div class="scratch-base">
+                                <span class="scratch-date">2026</span>
+                            </div>
+                            <canvas class="scratch-canvas" width="90" height="90"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <section class="countdown-section reveal">
+                    <div class="countdown-inner">
+                        <h2 class="countdown-title">
+                            THE COUNTDOWN BEGINS
+                        </h2>
+                        <div class="countdown-display">
+                            <div class="countdown-unit">
+                                <span class="countdown-num" id="days">00</span>
+                                <span class="countdown-label">DAYS</span>
+                            </div>
+                            <span class="countdown-sep" aria-hidden="true">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-num" id="hours">00</span>
+                                <span class="countdown-label">HOURS</span>
+                            </div>
+                            <span class="countdown-sep" aria-hidden="true">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-num" id="minutes">00</span>
+                                <span class="countdown-label">MINS</span>
+                            </div>
+                            <span class="countdown-sep" aria-hidden="true">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-num" id="seconds">00</span>
+                                <span class="countdown-label">SECS</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </section>
+            <img
+                src="assests/images/46.png"
+                alt="Wedding Details"
+                class="image-three-bg">
+
+            <div class="venue-overlay">
+                <p class="venue-label">Wedding at</p>
+                <a
+                    class="venue-link"
+                    href="https://www.google.com/maps/search/?api=1&query=St.+Georges+Cathedral+CSI+Church"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    ST. GEORGES CATHEDRAL CSI CHURCH
+                </a>
+
+                <p class="venue-label venue-label-reception">Reception at</p>
+                <a
+                    class="venue-link venue-link-reception"
+                    href="https://www.google.com/maps/search/?api=1&query=Trident+Chennai"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    Trident Chennai
+                </a>
+
+                <p class="venue-note">Tap the venue name to open its location on Google Maps.</p>
+            </div>
+
+            <div class="gifting-overlay">
+                <p class="gifting-eyebrow">Gifting Contribution<br><br></p>
+                <p class="gifting-intro">
+                    Your presence is the greatest gift of all. For those who wish to give a little something, you can do so in the following way.
+                </p>
+
+                <div class="gift-accordion">
+                    <details class="gift-item" name="gifting">
+                        <summary class="gift-trigger">
+                            <span class="gift-trigger-title">Groom</span>
+                            <span class="gift-trigger-icon" aria-hidden="true">⌄</span>
+                        </summary>
+
+                        <div class="gift-panel">
+                            <div class="gift-detail">
+                                <div class="gift-detail-head">
+                                    <span class="gift-label">Account Holder</span>
+                                    <button class="gift-copy-btn" type="button" data-copy="Sam Ashwin Jabaraj">Copy</button>
+                                </div>
+                                <span class="gift-value">Sam Ashwin Jabaraj</span>
+                            </div>
+
+                            <div class="gift-detail">
+                                <span class="gift-label">Bank</span>
+                                <span class="gift-value">Karur Vysya Bank</span>
+                            </div>
+
+                            <div class="gift-detail">
+                                <div class="gift-detail-head">
+                                    <span class="gift-label">Account Number</span>
+                                    <button class="gift-copy-btn" type="button" data-copy="1719155000010911">Copy</button>
+                                </div>
+                                <span class="gift-value">1719155000010911</span>
+                            </div>
+
+                            <div class="gift-detail">
+                                <span class="gift-label">IFSC</span>
+                                <span class="gift-value">KVBL0001719</span>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="gift-item" name="gifting">
+                        <summary class="gift-trigger">
+                            <span class="gift-trigger-title">Bride</span>
+                            <span class="gift-trigger-icon" aria-hidden="true">⌄</span>
+                        </summary>
+
+                        <div class="gift-panel">
+                            <div class="gift-detail">
+                                <div class="gift-detail-head">
+                                    <span class="gift-label">Account Holder</span>
+                                    <button class="gift-copy-btn" type="button" data-copy="Vishhni Rau A/P Jeganatha Rao">Copy</button>
+                                </div>
+                                <span class="gift-value">Vishhni Rau A/P Jeganatha Rao</span>
+                            </div>
+
+                            <div class="gift-detail">
+                                <span class="gift-label">Bank</span>
+                                <span class="gift-value">Maybank</span>
+                            </div>
+
+                            <div class="gift-detail">
+                                <div class="gift-detail-head">
+                                    <span class="gift-label">Account Number</span>
+                                    <button class="gift-copy-btn" type="button" data-copy="112232350664">Copy</button>
+                                </div>
+                                <span class="gift-value">112232350664</span>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- ================= RSVP SECTION ================= -->
+                <div class="rsvp-section" id="rsvpSection">
+                    <p class="rsvp-eyebrow">RSVP</p>
+                    <p class="rsvp-intro">Kindly respond to let us know if you will be joining us for the Reception.</p>
+
+                    <form id="rsvpForm" class="rsvp-form" novalidate>
+                        <div class="rsvp-field">
+                            <label for="rsvpGuestName" class="rsvp-label">Guest / Family Name *</label>
+                            <input type="text" id="rsvpGuestName" name="guestName" class="rsvp-input" placeholder="e.g. Sam & Family" required>
+                        </div>
+
+                        <div class="rsvp-field-row">
+                            <div class="rsvp-field rsvp-field-count">
+                                <label for="customGuestCountTrigger" class="rsvp-label">No. of Guests *</label>
+                                <div class="custom-select-wrapper" id="customGuestCountWrapper">
+                                    <button type="button" class="custom-select-trigger" id="customGuestCountTrigger" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="custom-select-label" id="customGuestCountLabel">1 Person</span>
+                                        <span class="custom-select-arrow" aria-hidden="true">⌄</span>
+                                    </button>
+                                    <ul class="custom-select-options" id="customGuestCountOptions" role="listbox">
+                                        <li class="custom-option selected" data-value="1" role="option" aria-selected="true">1 Person</li>
+                                        <li class="custom-option" data-value="2" role="option">2 Persons</li>
+                                        <li class="custom-option" data-value="3" role="option">3 Persons</li>
+                                        <li class="custom-option" data-value="4" role="option">4 Persons</li>
+                                        <li class="custom-option" data-value="5" role="option">5 Persons</li>
+                                        <li class="custom-option" data-value="6" role="option">6 Persons</li>
+                                        <li class="custom-option" data-value="7" role="option">7 Persons</li>
+                                        <li class="custom-option" data-value="8" role="option">8+ Persons</li>
+                                    </ul>
+                                    <input type="hidden" id="rsvpGuestCount" name="guestCount" value="1">
+                                </div>
+                            </div>
+
+                            <div class="rsvp-field rsvp-field-reception">
+                                <label class="rsvp-label">Reception *</label>
+                                <div class="rsvp-radio-group">
+                                    <label class="rsvp-radio-card">
+                                        <input type="radio" name="reception" value="Yes" checked>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">Attending</span>
+                                    </label>
+                                    <label class="rsvp-radio-card">
+                                        <input type="radio" name="reception" value="No">
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">Declining</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="rsvp-submit-btn" id="rsvpSubmitBtn">
+                            <span class="btn-text">Submit RSVP</span>
+                            <span class="btn-loader" aria-hidden="true"></span>
+                        </button>
+
+                        <div id="rsvpStatus" class="rsvp-status-message" aria-live="polite"></div>
+                    </form>
+                </div>
+
+                <!-- Celebration Quote -->
+                <p class="celebration-quote">JOIN US FOR A LITTLE PARTY TO CELEBRATE A LOT OF LOVE</p>
+
+                <!-- Footer Section -->
+                <footer class="site-footer">
+                    <a href="https://www.instagram.com/leora.invites" target="_blank" rel="noopener noreferrer" class="footer-link">
+                        Leora.invites
+                    </a>
+                </footer>
+            </div>
+        </div>
+
+    </section>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
