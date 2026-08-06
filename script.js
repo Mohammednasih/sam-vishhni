@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener("ended", () => {
 
         const heroSection = document.querySelector(".hero-section");
-        const firstInvitationImage = document.querySelector(".image-stack .img-wrap:first-child img");
+        const firstInvitationImage = document.querySelector(".image-stack .img-wrap:first-child img.main-image");
         const gettingMarriedText = document.querySelector(".getting-married-text");
         const invitationNameBlock = document.querySelector(".first-image-text");
         const invitationDate = document.querySelector(".invitation-date");
@@ -563,8 +563,12 @@ function setupScratchCards() {
                 const val = option.dataset.value;
                 const text = option.textContent;
 
-                if (hiddenGuestCount) hiddenGuestCount.value = val;
-                if (customLabel) customLabel.textContent = text;
+                if (val === "custom") {
+                    openCustomCountModal();
+                } else {
+                    if (hiddenGuestCount) hiddenGuestCount.value = val;
+                    if (customLabel) customLabel.textContent = text;
+                }
 
                 customOptions.forEach(opt => opt.classList.remove("selected"));
                 option.classList.add("selected");
@@ -580,6 +584,81 @@ function setupScratchCards() {
                 customTrigger.setAttribute("aria-expanded", "false");
             }
         });
+    }
+
+    function launchLoveBurst(event) {
+        const touchPoint = event.touches && event.touches[0]
+            ? event.touches[0]
+            : (event.changedTouches && event.changedTouches[0] ? event.changedTouches[0] : null);
+
+        const pointX = touchPoint ? touchPoint.clientX : (event.clientX || window.innerWidth / 2);
+        const pointY = touchPoint ? touchPoint.clientY : (event.clientY || window.innerHeight / 2);
+
+        createLoveBurst(pointX, pointY);
+    }
+
+    const customCountModal = document.getElementById("customCountModal");
+    const customCountInput = document.getElementById("customCountInput");
+    const customCountCancel = document.getElementById("customCountCancel");
+    const customCountConfirm = document.getElementById("customCountConfirm");
+
+    function openCustomCountModal() {
+        if (!customCountModal || !customCountInput) return;
+        customCountModal.classList.add("open");
+        customCountModal.setAttribute("aria-hidden", "false");
+        customCountInput.value = "";
+        setTimeout(() => customCountInput.focus(), 50);
+    }
+
+    function closeCustomCountModal() {
+        if (!customCountModal) return;
+        customCountModal.classList.remove("open");
+        customCountModal.setAttribute("aria-hidden", "true");
+    }
+
+    if (customCountCancel) {
+        customCountCancel.addEventListener("click", closeCustomCountModal);
+    }
+
+    if (customCountConfirm) {
+        customCountConfirm.addEventListener("click", () => {
+            const parsedValue = parseInt(customCountInput ? customCountInput.value : "", 10);
+
+            if (Number.isFinite(parsedValue) && parsedValue > 0) {
+                if (hiddenGuestCount) hiddenGuestCount.value = String(parsedValue);
+                if (customLabel) customLabel.textContent = `${parsedValue} ${parsedValue === 1 ? "Person" : "Persons"}`;
+            } else {
+                if (customLabel) customLabel.textContent = "1 Person";
+                if (hiddenGuestCount) hiddenGuestCount.value = "1";
+            }
+
+            closeCustomCountModal();
+        });
+    }
+
+    if (customCountModal) {
+        customCountModal.addEventListener("click", (event) => {
+            if (event.target === customCountModal) {
+                closeCustomCountModal();
+            }
+        });
+    }
+
+    document.addEventListener("pointerdown", launchLoveBurst);
+    document.addEventListener("touchstart", launchLoveBurst, { passive: true });
+    document.addEventListener("mousedown", launchLoveBurst);
+
+    function createLoveBurst(x, y) {
+        const heart = document.createElement("span");
+        heart.className = "love-burst-heart";
+        heart.textContent = "♥";
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+        heart.style.setProperty("--drift-x", `${(Math.random() - 0.5) * 140}px`);
+        heart.style.setProperty("--drift-y", `${-120 - Math.random() * 40}px`);
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 1200);
     }
 
     if (rsvpForm) {
@@ -689,6 +768,145 @@ function setupScratchCards() {
             }, 300);
         });
     }
+
+    // =========================
+    // WISHES CAROUSEL
+    // =========================
+
+    const wishesStorageKey = "samVishhniWishes";
+    const wishesForm = document.getElementById("wishesForm");
+    const wishesName = document.getElementById("wishName");
+    const wishesMessage = document.getElementById("wishMessage");
+    const wishesTrack = document.getElementById("wishesTrack");
+    const wishesStatus = document.getElementById("wishesStatus");
+    const wishesCarousel = document.getElementById("wishesCarousel");
+
+    const starterWishes = [];
+
+    function getStoredWishes() {
+        try {
+            const stored = localStorage.getItem(wishesStorageKey);
+            if (!stored) return [];
+            const parsed = JSON.parse(stored);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            console.warn("Could not read wishes storage", error);
+            return [];
+        }
+    }
+
+    function saveStoredWishes(items) {
+        localStorage.setItem(wishesStorageKey, JSON.stringify(items));
+    }
+
+    let wishesList = getStoredWishes();
+    let wishesIndex = 0;
+    let wishesRotationTimer;
+
+    function renderWishes() {
+        if (!wishesTrack) return;
+
+        wishesTrack.innerHTML = "";
+
+        if (!wishesList.length) {
+            const emptyCard = document.createElement("article");
+            emptyCard.className = "wish-card";
+            emptyCard.innerHTML = '<p class="wish-message">Be the first to leave a heartfelt wish for the couple.</p><p class="wish-name">A new memory awaits</p>';
+            wishesTrack.appendChild(emptyCard);
+            return;
+        }
+
+        wishesList.forEach((wish) => {
+            const card = document.createElement("article");
+            card.className = "wish-card";
+            card.innerHTML = `
+                <p class="wish-message">${wish.message}</p>
+                <p class="wish-name">— ${wish.name}</p>
+            `;
+            wishesTrack.appendChild(card);
+        });
+
+        updateCarousel();
+    }
+
+    function updateCarousel() {
+        if (!wishesTrack) return;
+        const offset = wishesIndex * 100;
+        wishesTrack.style.transform = `translateX(-${offset}%)`;
+    }
+
+    function startWishesRotation() {
+        clearInterval(wishesRotationTimer);
+        wishesRotationTimer = setInterval(() => {
+            if (!wishesList.length) return;
+            wishesIndex = (wishesIndex + 1) % wishesList.length;
+            updateCarousel();
+        }, 6000);
+    }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    if (wishesCarousel) {
+        wishesCarousel.addEventListener("touchstart", (event) => {
+            touchStartX = event.changedTouches[0].clientX;
+        }, { passive: true });
+
+        wishesCarousel.addEventListener("touchend", (event) => {
+            touchEndX = event.changedTouches[0].clientX;
+            const swipeDistance = touchEndX - touchStartX;
+
+            if (!wishesList.length) return;
+
+            if (swipeDistance < -50) {
+                wishesIndex = (wishesIndex + 1) % wishesList.length;
+                updateCarousel();
+            } else if (swipeDistance > 50) {
+                wishesIndex = (wishesIndex - 1 + wishesList.length) % wishesList.length;
+                updateCarousel();
+            }
+        }, { passive: true });
+    }
+
+    if (wishesForm) {
+        wishesForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            if (wishesStatus) {
+                wishesStatus.className = "rsvp-status-message";
+                wishesStatus.textContent = "";
+            }
+
+            const nameValue = wishesName ? wishesName.value.trim() : "";
+            const messageValue = wishesMessage ? wishesMessage.value.trim() : "";
+
+            if (!nameValue || !messageValue) {
+                if (wishesStatus) {
+                    wishesStatus.className = "rsvp-status-message error";
+                    wishesStatus.textContent = "Please add both your name and a heartfelt wish.";
+                }
+                return;
+            }
+
+            wishesList = [{
+                name: nameValue,
+                message: messageValue
+            }, ...wishesList].slice(0, 12);
+            wishesIndex = 0;
+            saveStoredWishes(wishesList);
+            renderWishes();
+            startWishesRotation();
+            wishesForm.reset();
+
+            if (wishesStatus) {
+                wishesStatus.className = "rsvp-status-message success";
+                wishesStatus.textContent = "Your wish is now part of the shared carousel.";
+            }
+        });
+    }
+
+    renderWishes();
+    startWishesRotation();
 
     // =========================
     // PAGE HIDE
