@@ -226,6 +226,9 @@ function onAllScratched() {
         countdownSection.classList.add("show-countdown");
     }
 
+    const marriageBlocks = document.querySelectorAll(".marriage-scratched-reveal");
+    marriageBlocks.forEach(el => el.classList.add("show-scratched"));
+
     const scratchContainer = document.querySelector(".scratch-container");
 
     let origin = { x: 0.5, y: 0.5 };
