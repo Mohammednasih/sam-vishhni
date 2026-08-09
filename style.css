@@ -167,12 +167,12 @@ body{
 
 .top-overlay {
   position:absolute;
-  top:-200px;
+  top:-130px;
   left:50%;
   transform:translateX(-50%);
   width:40%;
   max-width:30px;
-  opacity:0.5;
+  opacity:0.7;
   z-index:2;
   pointer-events:none;
 }
@@ -187,6 +187,7 @@ body{
 }
 
 .invitation-card {
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -259,7 +260,7 @@ body{
 
 .getting-married-text {
   position:absolute;
-  top:18%;
+  top:20%;
   left:50%;
   transform:translate(-50%, -50%) translateY(16px) scale(0.985);
   z-index:3;
@@ -301,6 +302,8 @@ body{
   text-align:center;
   display:flex;
   flex-direction:column;
+  align-items:center;
+  justify-content:center;
   gap:0.2rem;
   line-height:1.5;
 }
@@ -651,7 +654,7 @@ body{
 
 .marriage-img {
     display: block;
-    margin: 1.5rem auto 0;
+    margin: -6.8rem auto 0;
     width: min(88%, 380px);
     max-width: 100%;
     height: auto;
@@ -737,8 +740,23 @@ body{
     color:#48657c;
 }
 
+.marriage-scratched-reveal {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease;
+}
+
+.marriage-scratched-reveal.show-scratched {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
 .gifting-eyebrow{
-    margin:0 0 2.65rem;
+    margin: 2.8rem 0 1.5rem;
     text-align:center;
     font-family:'Great Vibes', cursive;
     font-size:clamp(2.75rem, 5.4vw, 3.55rem);
@@ -747,12 +765,12 @@ body{
 }
 
 .gifting-intro{
-    margin:0 auto 3rem;
+    margin:0 auto 2.5rem;
     max-width:40ch;
     text-align:center;
     font-family:'Cormorant Garamond', serif;
     font-size:clamp(1.15rem, 3.8vw, 1.7rem);
-     font-style:italic;
+    font-style:italic;
     line-height:1.22;
     color:#19191a;
     text-shadow:0 1px 10px rgba(255,255,255,0.34);
@@ -760,17 +778,21 @@ body{
 
 .gifting-icon {
     display: block;
-    margin: 0 auto 0.35rem;
+    margin: -0.6rem auto 0.5rem;
     animation: dance-pulse 3.6s ease-in-out infinite;
-    width: 200px !important;
+    width: 130px !important;
     height: auto;
+    position: relative;
+    left: -16px;
+    z-index: 5;
 }
 
 @media (max-width: 480px) {
     .gifting-icon {
-        width: min(40px, 12vw);
-        max-width: 40px;
-        margin: 0 auto 0.75rem;
+        width: min(80px, 22vw) ;
+        max-width: 80px ;
+        margin: -0.5rem auto 0.4rem;
+        left: -10px;
     }
 }
 
