@@ -10,7 +10,7 @@ body{
   width:100%;
   overflow-x:hidden;
   overscroll-behavior-x:none;
-  background:#ebe7e2;
+  background:#dfeef8;
   font-family:sans-serif;
 }
 .overlay {
@@ -98,7 +98,8 @@ body{
   margin-top:18px;
   color:#fff;
   font-size:.9rem;
-  letter-spacing:3px;
+  letter-spacing:6px;
+  line-height:1.8;
   text-transform:uppercase;
 }
 
@@ -147,7 +148,7 @@ body{
   margin:auto;
   position:relative;
   line-height:0;
-  z-index:1;
+  z-index:4;
   overflow:hidden;
 }
 
@@ -167,7 +168,7 @@ body{
 
 .top-overlay {
   position:absolute;
-  top:-130px;
+  top:-20px;
   left:50%;
   transform:translateX(-50%);
   width:40%;
@@ -184,6 +185,10 @@ body{
   background:rgba(0, 0, 0, 0.25);
   z-index:1;
   pointer-events:none;
+}
+
+.image-stack .img-wrap:first-child {
+  z-index:1;
 }
 
 .invitation-card {
@@ -227,7 +232,7 @@ body{
   font-weight:700;
   font-size:clamp(1.5rem, 6.4vw, 5.2rem);
   line-height:2.2;
-  letter-spacing:clamp(0.02em, 0.4vw, 0.08em);
+  letter-spacing:clamp(0.05em, 0.4vw, 1em);
   color:#ffffff;
 }
 
@@ -291,9 +296,9 @@ body{
   font-family:'Cinzel', sans-serif;
   font-style:italic;
   width:min(88vw, 340px);
-  font-size:clamp(0.88rem, 2.4vw, 1.06rem);
-  font-weight:300;
-  letter-spacing:0.08em;
+  font-size:clamp(1rem, 2.4vw, 1.5rem);
+  font-weight:700;
+  letter-spacing:1em;
   text-transform:uppercase;
   z-index:2;
   opacity:0;
@@ -346,7 +351,8 @@ body{
 .scroll-text {
   font-family:'Cinzel', sans-serif;
   font-style:italic;
-  font-size:0.72rem;
+  font-weight:800;
+  font-size:1rem;
   letter-spacing:0.18em;
   text-transform:uppercase;
 }
@@ -388,11 +394,31 @@ body{
 
 /* STACK EFFECT */
 .image-stack .img-wrap:nth-child(2){
-  margin-top:0px;
+  position:relative;
+  z-index:2;
+  margin-top:-30px;
+  transform: scale(1.07);
+  box-shadow: 0 26px 36px -20px rgba(0, 0, 0, 0.5);
+}
+
+.image-stack .img-wrap:nth-child(2)::after {
+  content:"";
+  position:absolute;
+  left:4%;
+  right:4%;
+  bottom:-18px;
+  height:32px;
+  background:linear-gradient(to bottom, rgba(39, 38, 35, 0), rgba(39, 38, 35, 0.14), rgba(39, 38, 35, 0.45), rgba(39, 38, 35, 0.62));
+  filter:blur(18px);
+  opacity:1;
+  pointer-events:none;
+  z-index:3;
 }
 
 .image-stack .img-wrap:nth-child(3){
-  margin-top:0px;
+  position:relative;
+  z-index:3;
+  margin-top:-13px;
 }
 
 .image-stack .img-wrap:nth-child(4) img{
@@ -420,8 +446,8 @@ body{
   }
 
   .name-line {
-    font-size:clamp(1.45rem, 6.2vw, 4.8rem);
-    letter-spacing:clamp(0.01em, 0.3vw, 0.06em);
+    font-size:clamp(1.45rem, 6.2vw, 5rem);
+    letter-spacing:clamp(0.1em, 0.5vw, 1em);
     white-space:nowrap;
   }
 
@@ -434,15 +460,15 @@ body{
   }
 
   .scroll-text {
-    font-size:0.62rem;
+    font-size:0.8rem;
   }
 
 }
 
 @media (max-width:420px) {
   .invitation-date {
-    font-size: clamp(0.66rem, 2.0vw, 0.9rem);
-    letter-spacing: 0.03em;
+    font-size: clamp(0.66rem, 2.0vw, 1.2rem);
+    letter-spacing: 0.06em;
   }
   .invitation-date span {
     white-space: nowrap;
@@ -502,7 +528,7 @@ body{
   left: 50%;
   transform: translateX(-50%);
   top: 0.6rem;
-  bottom: 0.6rem;
+  bottom: 3.5rem;
   width: 2px;
   background: rgba(85, 114, 136, 0.35);
   border-radius: 1px;
@@ -914,17 +940,30 @@ body{
     width: 100%;
     overflow: hidden;
     padding-bottom: 2rem;
+    z-index: 1;
+    margin-top: -14px;
+}
+
+.image-three-wrap::before {
+    content: "";
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: -4px;
+    height: 44px;
 }
 
 .image-three-bg {
     position: absolute;
-    top: 0;
+    top: 0px;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% + 10px);
     object-fit: cover;
     object-position: top center;
-    z-index: 1;
+    z-index: 0;
+    filter: saturate(1.08) contrast(1.03) blur(0.2px);
+    box-shadow: inset 0 18px 30px rgba(0, 0, 0, 0.12);
 }
 
 .scratch-section{
