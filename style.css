@@ -1855,10 +1855,10 @@ body{
     display: flex;
     gap: 1rem;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: none;
     -webkit-overflow-scrolling: touch;
     padding: 0.5rem 0.25rem 0.85rem;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
 }
 
 /* Custom Scrollbar for Horizontal Wish Track */
