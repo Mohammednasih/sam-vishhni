@@ -70,7 +70,7 @@
             <div id="playOverlay" class="overlay">
 
                 <img
-                    src="assests/images/cover.png"
+                    src="assests/images/cover.avif"
                     class="overlay-image"
                     alt="Cover Image">
 
@@ -422,12 +422,14 @@
                     </form>
 
                     <div class="wishes-scroll-shell">
-                        <div class="wishes-scroll-hint" id="wishesScrollHint" style="display: none;">
-                            <span>Scroll sideways to view wishes</span>
-                            <span class="hint-arrow" aria-hidden="true">→</span>
+                        <div class="wishes-track vertical-track" id="wishesTrack">
+                            <!-- Dynamically loaded vertical wish tiles -->
                         </div>
-                        <div class="wishes-track" id="wishesTrack">
-                            <!-- Dynamically loaded horizontal wish tiles -->
+                        <div class="wishes-toggle-wrapper" id="wishesToggleWrapper" style="display: none;">
+                            <button type="button" class="wishes-toggle-btn" id="wishesToggleBtn">
+                                <span id="wishesToggleText">Read More Wishes</span>
+                                <span class="wishes-toggle-arrow" id="wishesToggleArrow">⌄</span>
+                            </button>
                         </div>
                     </div>
                 </div>
