@@ -794,6 +794,7 @@ function setupScratchCards() {
     const wishesTrack = document.getElementById("wishesTrack");
     const wishesStatus = document.getElementById("wishesStatus");
     const wishesSubmitBtn = document.getElementById("wishesSubmitBtn");
+    const wishesScrollHint = document.getElementById("wishesScrollHint");
 
     let rtdb = null;
     let isFirebaseReady = false;
@@ -904,7 +905,71 @@ function setupScratchCards() {
         }
     }
 
-    const wishesScrollHint = document.getElementById("wishesScrollHint");
+    // ============================================================
+    // CONTINUOUS SLOW AUTO-SCROLL CONTROLLER
+    // ============================================================
+    let autoScrollAnimId = null;
+    let isUserInteracting = false;
+    let userInteractionTimeout = null;
+    let scrollAccumulator = 0;
+    const autoScrollSpeed = 0.45; // Smooth, continuous luxury scroll speed
+
+    function startAutoScroll() {
+        stopAutoScroll();
+        if (!wishesTrack) return;
+        scrollAccumulator = wishesTrack.scrollLeft || 0;
+
+        function autoScrollStep() {
+            if (!wishesTrack) return;
+            const maxScroll = wishesTrack.scrollWidth - wishesTrack.clientWidth;
+
+            if (!isUserInteracting && maxScroll > 2) {
+                scrollAccumulator += autoScrollSpeed;
+                if (scrollAccumulator >= maxScroll - 1) {
+                    scrollAccumulator = 0;
+                }
+                wishesTrack.scrollLeft = scrollAccumulator;
+            } else {
+                scrollAccumulator = wishesTrack.scrollLeft || 0;
+            }
+
+            autoScrollAnimId = requestAnimationFrame(autoScrollStep);
+        }
+
+        autoScrollAnimId = requestAnimationFrame(autoScrollStep);
+    }
+
+    function stopAutoScroll() {
+        if (autoScrollAnimId) {
+            cancelAnimationFrame(autoScrollAnimId);
+            autoScrollAnimId = null;
+        }
+    }
+
+    function handleInteractionStart() {
+        isUserInteracting = true;
+        if (userInteractionTimeout) clearTimeout(userInteractionTimeout);
+    }
+
+    function handleInteractionEnd() {
+        if (userInteractionTimeout) clearTimeout(userInteractionTimeout);
+        userInteractionTimeout = setTimeout(() => {
+            isUserInteracting = false;
+            if (wishesTrack) scrollAccumulator = wishesTrack.scrollLeft || 0;
+        }, 1800);
+    }
+
+    if (wishesTrack) {
+        wishesTrack.addEventListener("touchstart", handleInteractionStart, { passive: true });
+        wishesTrack.addEventListener("touchend", handleInteractionEnd, { passive: true });
+        wishesTrack.addEventListener("mousedown", handleInteractionStart, { passive: true });
+        wishesTrack.addEventListener("mouseup", handleInteractionEnd, { passive: true });
+        wishesTrack.addEventListener("mouseleave", handleInteractionEnd, { passive: true });
+        wishesTrack.addEventListener("wheel", () => {
+            handleInteractionStart();
+            handleInteractionEnd();
+        }, { passive: true });
+    }
 
     function renderWishesTrack(wishes) {
         if (!wishesTrack) return;
@@ -913,6 +978,7 @@ function setupScratchCards() {
 
         if (!wishesList || wishesList.length === 0) {
             if (wishesScrollHint) wishesScrollHint.style.display = "none";
+            stopAutoScroll();
             const emptyCard = document.createElement("article");
             emptyCard.className = "wish-card empty-card";
             emptyCard.innerHTML = `
@@ -932,7 +998,10 @@ function setupScratchCards() {
 
         const likedWishes = getLikedWishesLocal();
 
-        wishesList.forEach(wish => {
+        // Duplicate list if fewer than 6 items to create continuous seamless scrolling!
+        const renderList = wishesList.length > 0 && wishesList.length < 8 ? [...wishesList, ...wishesList] : wishesList;
+
+        renderList.forEach((wish, index) => {
             const card = document.createElement("article");
             card.className = "wish-card";
             const isLiked = likedWishes.includes(wish.id);
@@ -964,6 +1033,10 @@ function setupScratchCards() {
 
             wishesTrack.appendChild(card);
         });
+
+        scrollAccumulator = 0;
+        wishesTrack.scrollLeft = 0;
+        startAutoScroll();
     }
 
     if (wishesForm) {
@@ -1046,7 +1119,8 @@ function setupScratchCards() {
                     });
                 }
                 if (wishesTrack) {
-                    wishesTrack.scrollTo({ left: 0, behavior: "smooth" });
+                    wishesTrack.scrollLeft = 0;
+                    startAutoScroll();
                 }
             }
         });
