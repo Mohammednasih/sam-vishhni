@@ -772,9 +772,20 @@ function setupScratchCards() {
         });
     }
 
-    // =========================
-    // WISHES CAROUSEL
-    // =========================
+    // ============================================================
+    // FIREBASE REALTIME DATABASE CONFIGURATION & WISHES SECTION
+    // ============================================================
+
+    // FIREBASE CREDENTIALS
+    const firebaseConfig = {
+        apiKey: "AIzaSyCm5TOVc93_Jnc7HMvNslUQXg75f6HdO6Q",
+        authDomain: "sam-wish.firebaseapp.com",
+        databaseURL: "https://sam-wish-default-rtdb.firebaseio.com",
+        projectId: "sam-wish",
+        storageBucket: "sam-wish.firebasestorage.app",
+        messagingSenderId: "1068458930855",
+        appId: "1:1068458930855:web:2c7c496f0e8382288d6182"
+    };
 
     const wishesStorageKey = "samVishhniWishes";
     const wishesForm = document.getElementById("wishesForm");
@@ -782,9 +793,37 @@ function setupScratchCards() {
     const wishesMessage = document.getElementById("wishMessage");
     const wishesTrack = document.getElementById("wishesTrack");
     const wishesStatus = document.getElementById("wishesStatus");
-    const wishesCarousel = document.getElementById("wishesCarousel");
+    const wishesSubmitBtn = document.getElementById("wishesSubmitBtn");
 
-    const starterWishes = [];
+    let rtdb = null;
+    let isFirebaseReady = false;
+
+    if (typeof firebase !== "undefined") {
+        try {
+            if (!firebase.apps.length) {
+                if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                    firebase.initializeApp(firebaseConfig);
+                    rtdb = firebase.database();
+                    isFirebaseReady = true;
+                }
+            } else {
+                rtdb = firebase.database();
+                isFirebaseReady = true;
+            }
+        } catch (err) {
+            console.warn("Firebase initialization notice:", err);
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     function getStoredWishes() {
         try {
@@ -799,76 +838,132 @@ function setupScratchCards() {
     }
 
     function saveStoredWishes(items) {
-        localStorage.setItem(wishesStorageKey, JSON.stringify(items));
+        try {
+            localStorage.setItem(wishesStorageKey, JSON.stringify(items));
+        } catch (e) {}
     }
 
-    let wishesList = getStoredWishes();
-    let wishesIndex = 0;
-    let wishesRotationTimer;
+    function getLikedWishesLocal() {
+        try {
+            const stored = localStorage.getItem("samVishhniLikedWishes");
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            return [];
+        }
+    }
 
-    function renderWishes() {
+    function setLikedWishesLocal(likedArray) {
+        try {
+            localStorage.setItem("samVishhniLikedWishes", JSON.stringify(likedArray));
+        } catch (e) {}
+    }
+
+    function formatTimeAgo(timestamp) {
+        if (!timestamp) return "";
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        if (seconds < 60) return "Just now";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days}d ago`;
+        const date = new Date(timestamp);
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    function handleLikeClick(wishId, currentLikes) {
+        const likedList = getLikedWishesLocal();
+        const isLiked = likedList.includes(wishId);
+
+        if (isFirebaseReady && rtdb) {
+            const likesRef = rtdb.ref(`wishes/${wishId}/likes`);
+            likesRef.transaction((curr) => {
+                const val = curr || 0;
+                return isLiked ? Math.max(0, val - 1) : val + 1;
+            }).then(() => {
+                if (isLiked) {
+                    setLikedWishesLocal(likedList.filter(id => id !== wishId));
+                } else {
+                    setLikedWishesLocal([...likedList, wishId]);
+                }
+            }).catch(err => console.error("Transaction error:", err));
+        } else {
+            let wishes = getStoredWishes();
+            const wishObj = wishes.find(w => w.id === wishId);
+            if (wishObj) {
+                wishObj.likes = isLiked ? Math.max(0, (wishObj.likes || 1) - 1) : (wishObj.likes || 0) + 1;
+                if (isLiked) {
+                    setLikedWishesLocal(likedList.filter(id => id !== wishId));
+                } else {
+                    setLikedWishesLocal([...likedList, wishId]);
+                }
+                saveStoredWishes(wishes);
+                renderWishesTrack(wishes);
+            }
+        }
+    }
+
+    const wishesScrollHint = document.getElementById("wishesScrollHint");
+
+    function renderWishesTrack(wishes) {
         if (!wishesTrack) return;
-
+        const wishesList = wishes || [];
         wishesTrack.innerHTML = "";
 
-        if (!wishesList.length) {
+        if (!wishesList || wishesList.length === 0) {
+            if (wishesScrollHint) wishesScrollHint.style.display = "none";
             const emptyCard = document.createElement("article");
-            emptyCard.className = "wish-card";
-            emptyCard.innerHTML = '<p class="wish-message">Be the first to leave a heartfelt wish for the couple.</p><p class="wish-name">A new memory awaits</p>';
+            emptyCard.className = "wish-card empty-card";
+            emptyCard.innerHTML = `
+                <div class="wish-card-quote">“</div>
+                <p class="wish-message">Be the first to leave a heartfelt wish for the couple!</p>
+                <div class="wish-footer">
+                    <p class="wish-name">A new memory awaits</p>
+                </div>
+            `;
             wishesTrack.appendChild(emptyCard);
             return;
         }
 
-        wishesList.forEach((wish) => {
+        if (wishesScrollHint) {
+            wishesScrollHint.style.display = wishesList.length >= 2 ? "flex" : "none";
+        }
+
+        const likedWishes = getLikedWishesLocal();
+
+        wishesList.forEach(wish => {
             const card = document.createElement("article");
             card.className = "wish-card";
+            const isLiked = likedWishes.includes(wish.id);
+            const timeAgo = formatTimeAgo(wish.timestamp);
+            const likesCount = wish.likes || 0;
+
             card.innerHTML = `
-                <p class="wish-message">${wish.message}</p>
-                <p class="wish-name">— ${wish.name}</p>
+                <div class="wish-card-quote">“</div>
+                <p class="wish-message">${escapeHtml(wish.message)}</p>
+                <div class="wish-footer">
+                    <div class="wish-meta">
+                        <p class="wish-name">${escapeHtml(wish.name)}</p>
+                        ${timeAgo ? `<span class="wish-time">${timeAgo}</span>` : ''}
+                    </div>
+                    <button type="button" class="wish-like-btn ${isLiked ? 'liked' : ''}" data-wish-id="${wish.id}" aria-label="Like wish">
+                        <span class="like-icon">${isLiked ? '❤️' : '🤍'}</span>
+                        <span class="wish-like-count">${likesCount}</span>
+                    </button>
+                </div>
             `;
+
+            const likeBtn = card.querySelector(".wish-like-btn");
+            if (likeBtn) {
+                likeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    handleLikeClick(wish.id, likesCount);
+                });
+            }
+
             wishesTrack.appendChild(card);
         });
-
-        updateCarousel();
-    }
-
-    function updateCarousel() {
-        if (!wishesTrack) return;
-        const offset = wishesIndex * 100;
-        wishesTrack.style.transform = `translateX(-${offset}%)`;
-    }
-
-    function startWishesRotation() {
-        clearInterval(wishesRotationTimer);
-        wishesRotationTimer = setInterval(() => {
-            if (!wishesList.length) return;
-            wishesIndex = (wishesIndex + 1) % wishesList.length;
-            updateCarousel();
-        }, 6000);
-    }
-
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    if (wishesCarousel) {
-        wishesCarousel.addEventListener("touchstart", (event) => {
-            touchStartX = event.changedTouches[0].clientX;
-        }, { passive: true });
-
-        wishesCarousel.addEventListener("touchend", (event) => {
-            touchEndX = event.changedTouches[0].clientX;
-            const swipeDistance = touchEndX - touchStartX;
-
-            if (!wishesList.length) return;
-
-            if (swipeDistance < -50) {
-                wishesIndex = (wishesIndex + 1) % wishesList.length;
-                updateCarousel();
-            } else if (swipeDistance > 50) {
-                wishesIndex = (wishesIndex - 1 + wishesList.length) % wishesList.length;
-                updateCarousel();
-            }
-        }, { passive: true });
     }
 
     if (wishesForm) {
@@ -886,30 +981,108 @@ function setupScratchCards() {
             if (!nameValue || !messageValue) {
                 if (wishesStatus) {
                     wishesStatus.className = "rsvp-status-message error";
-                    wishesStatus.textContent = "Please add both your name and a heartfelt wish.";
+                    wishesStatus.textContent = "Please enter both your name and a heartfelt wish.";
                 }
+                if (!nameValue && wishesName) wishesName.focus();
+                else if (!messageValue && wishesMessage) wishesMessage.focus();
                 return;
             }
 
-            wishesList = [{
-                name: nameValue,
-                message: messageValue
-            }, ...wishesList].slice(0, 12);
-            wishesIndex = 0;
-            saveStoredWishes(wishesList);
-            renderWishes();
-            startWishesRotation();
-            wishesForm.reset();
+            if (wishesSubmitBtn) {
+                wishesSubmitBtn.disabled = true;
+                wishesSubmitBtn.classList.add("loading");
+            }
 
-            if (wishesStatus) {
-                wishesStatus.className = "rsvp-status-message success";
-                wishesStatus.textContent = "Your wish is now part of the shared carousel.";
+            const wishData = {
+                name: nameValue,
+                message: messageValue,
+                timestamp: Date.now(),
+                likes: 0
+            };
+
+            if (isFirebaseReady && rtdb) {
+                const newWishRef = rtdb.ref("wishes").push();
+                newWishRef.set(wishData).then(() => {
+                    onWishSuccess();
+                }).catch(err => {
+                    console.error("Firebase write error:", err);
+                    if (wishesStatus) {
+                        wishesStatus.className = "rsvp-status-message error";
+                        wishesStatus.textContent = "Could not send wish. Please check your internet connection.";
+                    }
+                    if (wishesSubmitBtn) {
+                        wishesSubmitBtn.disabled = false;
+                        wishesSubmitBtn.classList.remove("loading");
+                    }
+                });
+            } else {
+                let currentWishes = getStoredWishes();
+                const newWish = {
+                    id: "local_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+                    ...wishData
+                };
+                currentWishes.unshift(newWish);
+                saveStoredWishes(currentWishes);
+                renderWishesTrack(currentWishes);
+                onWishSuccess();
+            }
+
+            function onWishSuccess() {
+                wishesForm.reset();
+                if (wishesSubmitBtn) {
+                    wishesSubmitBtn.disabled = false;
+                    wishesSubmitBtn.classList.remove("loading");
+                }
+                if (wishesStatus) {
+                    wishesStatus.className = "rsvp-status-message success";
+                    wishesStatus.textContent = "Thank you! Your wish has been added to the wish board.";
+                }
+                if (typeof confetti === "function") {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.8 },
+                        colors: ["#ffffff", "#EAF7FF", "#C6E9FF", "#8ED0FF", "#4DB8FF"]
+                    });
+                }
+                if (wishesTrack) {
+                    wishesTrack.scrollTo({ left: 0, behavior: "smooth" });
+                }
             }
         });
     }
 
-    renderWishes();
-    startWishesRotation();
+    function initWishesSection() {
+        if (isFirebaseReady && rtdb) {
+            const wishesRef = rtdb.ref("wishes");
+            wishesRef.on("value", (snapshot) => {
+                const data = snapshot.val();
+                let fetched = [];
+                if (data) {
+                    Object.keys(data).forEach(id => {
+                        fetched.push({
+                            id: id,
+                            name: data[id].name || "Anonymous",
+                            message: data[id].message || "",
+                            timestamp: data[id].timestamp || Date.now(),
+                            likes: data[id].likes || 0
+                        });
+                    });
+                    fetched.sort((a, b) => b.timestamp - a.timestamp);
+                }
+                renderWishesTrack(fetched);
+            }, (error) => {
+                console.warn("Realtime DB read notice:", error);
+                const localWishes = getStoredWishes();
+                renderWishesTrack(localWishes);
+            });
+        } else {
+            const localWishes = getStoredWishes();
+            renderWishesTrack(localWishes);
+        }
+    }
+
+    initWishesSection();
 
     // =========================
     // PAGE HIDE
