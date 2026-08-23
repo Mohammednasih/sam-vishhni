@@ -10,7 +10,7 @@ body{
   width:100%;
   overflow-x:hidden;
   overscroll-behavior-x:none;
-  background:#dfeef8;
+  background:transparent;
   font-family:sans-serif;
 }
 .overlay {
